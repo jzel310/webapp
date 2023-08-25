@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ template "webapp.fullname" . }}
+  name: "{{ .Values.app.name }}-{{ .Values.app.suffix }}-ingress"
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/use-regex: "true"
@@ -10,10 +10,10 @@ spec:
   rules:
   - http:
       paths:
-      - path: /(.*)
+      - path: {{ .Values.app.path }}
         pathType: Prefix
         backend:
           service:
-            name: {{ template "webapp.fullname" . }}
+            name: "{{ .Values.app.name }}-{{ .Values.app.suffix }}"
             port:
               number: 80

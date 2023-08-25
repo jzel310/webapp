@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ template "webapp.fullname" . }}
   labels:
-    app: {{ template "webapp.name" . }}
+    app: "{{ .Values.app.name }}-{{ .Values.app.suffix }}"
     chart: {{ template "webapp.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -11,12 +11,12 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "webapp.name" . }}
+      app: "{{ .Values.app.name }}-{{ .Values.app.suffix }}"
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "webapp.name" . }}
+        app: "{{ .Values.app.name }}-{{ .Values.app.suffix }}"
         release: {{ .Release.Name }}
     spec:
       containers:

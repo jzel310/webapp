@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "webapp.fullname" . }}
+  name: "{{ .Values.app.name }}-{{ .Values.app.suffix }}"
   labels:
-    app: {{ template "webapp.name" . }}
+    app: "{{ .Values.app.name }}-{{ .Values.app.suffix }}"
     chart: {{ template "webapp.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -15,5 +15,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: {{ template "webapp.name" . }}
+    app: "{{ .Values.app.name }}-{{ .Values.app.suffix }}"
     release: {{ .Release.Name }}

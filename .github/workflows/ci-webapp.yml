@@ -40,7 +40,7 @@ jobs:
           tags: |
             acmellc.azurecr.io/webapp:${{ steps.vars.outputs.short_sha }}
             acmellc.azurecr.io/webapp:latest
-  deploy:
+  deploy_dev:
     needs: build_and_push
     name: Deploy to Kubernetes DEV Cluster
     runs-on: ubuntu-latest
@@ -55,4 +55,55 @@ jobs:
     - name: Use context
       run: kubectl config use-context aks-sandbox
     - name: Deploy to K8s
-      run: helm upgrade --install -f helm/webapp/values.yaml webapp helm/webapp/ -n dev
+      run: helm upgrade --install -f helm/dev/values.yaml webapp helm/webapp/ -n dev
+
+  deploy_qa:
+    needs: deploy_dev
+    name: Deploy to Kubernetes QA Cluster
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Create kubeconfig
+      run: |
+        mkdir ${HOME}/.kube
+        echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+        cat ${HOME}/.kube/config
+    - name: Use context
+      run: kubectl config use-context aks-sandbox
+    - name: Deploy to K8s
+      run: helm upgrade --install -f helm/qa/values.yaml webapp helm/webapp/ -n qa
+
+  deploy_staging:
+    needs: deploy_qa
+    name: Deploy to Kubernetes Staging Cluster
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Create kubeconfig
+      run: |
+        mkdir ${HOME}/.kube
+        echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+        cat ${HOME}/.kube/config
+    - name: Use context
+      run: kubectl config use-context aks-sandbox
+    - name: Deploy to K8s
+      run: helm upgrade --install -f helm/staging/values.yaml webapp helm/webapp/ -n staging
+
+  deploy_prod:
+    needs: deploy_staging
+    name: Deploy to Kubernetes PROD Cluster
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Create kubeconfig
+      run: |
+        mkdir ${HOME}/.kube
+        echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+        cat ${HOME}/.kube/config
+    - name: Use context
+      run: kubectl config use-context aks-sandbox
+    - name: Deploy to K8s
+      run: helm upgrade --install -f helm/prod/values.yaml webapp helm/webapp/ -n prod
