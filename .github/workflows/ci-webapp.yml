@@ -1,9 +1,9 @@
-name: Build
+name: Build webapp
 
 on: [push]
 
 jobs:
-  push_to_registry:
+  build_and_push:
     name: Push webapp image to docker hub
     runs-on: ubuntu-latest
     steps:
@@ -14,8 +14,8 @@ jobs:
         uses: azure/docker-login@v1
         with:
           login-server: acmellc.azurecr.io
-          username: ${{ secrets.AZURE_CLIENT_ID }}
-          password: ${{ secrets.AZURE_CLIENT_SECRET }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
       
       - name: Extract metadata (tags, labels) for Docker
         id: meta
