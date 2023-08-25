@@ -11,10 +11,10 @@ spec:
   rules:
   - http:
       paths:
-      - path: /react(/|$)(.*)
+      - path: /(.*)
         pathType: Prefix
         backend:
           service:
             name: {{ template "webapp.fullname" . }}
             port:
-              number: 3000
+              number: 80
