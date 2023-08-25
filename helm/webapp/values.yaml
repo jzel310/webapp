@@ -5,10 +5,10 @@
 replicaCount: 1
 
 image:
-  repository: acmellc.azurecr.io/webapp:latest
+  repository: webapp
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: latest
 
 imagePullSecrets: acracme
 nameOverride: ""
