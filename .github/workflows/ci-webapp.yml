@@ -1,6 +1,6 @@
 name: Build webapp
 
-on: [push]
+on: workflow_dispatch
 
 jobs:
   build_and_push:
