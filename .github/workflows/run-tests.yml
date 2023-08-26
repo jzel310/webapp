@@ -44,7 +44,9 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Build Docker image
-        run: |
-          docker build -t webapp:latest .
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build Docker image
+      run: |
+        docker build -t webapp:latest .
       
