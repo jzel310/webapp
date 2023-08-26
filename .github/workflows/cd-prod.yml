@@ -1,0 +1,39 @@
+name: Build and deploy webapp to PROD
+
+on: workflow_dispatch
+
+jobs:
+  deploy_prod:
+    name: Deploy to Kubernetes PROD Cluster
+    runs-on: ubuntu-latest
+    steps:
+      uses: actions/checkout@v3
+        with:
+          ref: release
+    - name: Create kubeconfig
+      run: |
+        mkdir ${HOME}/.kube
+        echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+        cat ${HOME}/.kube/config
+    - name: Use context
+      run: kubectl config use-context aks-sandbox
+    - name: Deploy to K8s
+      run: helm upgrade --install -f helm/prod/values.yaml webapp helm/webapp/ -n prod
+
+  # deploy_staging:
+  #   needs: deploy_qa
+  #   name: Deploy to Kubernetes Staging Cluster
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v2
+  #   - name: Create kubeconfig
+  #     run: |
+  #       mkdir ${HOME}/.kube
+  #       echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+  #       cat ${HOME}/.kube/config
+  #   - name: Use context
+  #     run: kubectl config use-context aks-sandbox
+  #   - name: Deploy to K8s
+  #     run: helm upgrade --install -f helm/staging/values.yaml webapp helm/webapp/ -n staging
+

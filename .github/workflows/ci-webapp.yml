@@ -1,6 +1,9 @@
-name: Build webapp
+name: Build and deploy webapp to DEV
 
-on: workflow_dispatch
+on:
+  push:
+    branches: 
+      - develop
 
 jobs:
   build_and_push:
@@ -12,8 +15,9 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
+      uses: actions/checkout@v3
+        with:
+          ref: develop
       
       - name: Auth to ACR
         uses: azure/docker-login@v1
@@ -45,8 +49,9 @@ jobs:
     name: Deploy to Kubernetes DEV Cluster
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
+        with:
+          ref: develop
     - name: Create kubeconfig
       run: |
         mkdir ${HOME}/.kube
@@ -57,53 +62,53 @@ jobs:
     - name: Deploy to K8s
       run: helm upgrade --install -f helm/dev/values.yaml webapp helm/webapp/ -n dev
 
-  deploy_qa:
-    needs: deploy_dev
-    name: Deploy to Kubernetes QA Cluster
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Create kubeconfig
-      run: |
-        mkdir ${HOME}/.kube
-        echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
-        cat ${HOME}/.kube/config
-    - name: Use context
-      run: kubectl config use-context aks-sandbox
-    - name: Deploy to K8s
-      run: helm upgrade --install -f helm/qa/values.yaml webapp helm/webapp/ -n qa
+  # deploy_qa:
+  #   needs: deploy_dev
+  #   name: Deploy to Kubernetes QA Cluster
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v2
+  #   - name: Create kubeconfig
+  #     run: |
+  #       mkdir ${HOME}/.kube
+  #       echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+  #       cat ${HOME}/.kube/config
+  #   - name: Use context
+  #     run: kubectl config use-context aks-sandbox
+  #   - name: Deploy to K8s
+  #     run: helm upgrade --install -f helm/qa/values.yaml webapp helm/webapp/ -n qa
 
-  deploy_staging:
-    needs: deploy_qa
-    name: Deploy to Kubernetes Staging Cluster
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Create kubeconfig
-      run: |
-        mkdir ${HOME}/.kube
-        echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
-        cat ${HOME}/.kube/config
-    - name: Use context
-      run: kubectl config use-context aks-sandbox
-    - name: Deploy to K8s
-      run: helm upgrade --install -f helm/staging/values.yaml webapp helm/webapp/ -n staging
+  # deploy_staging:
+  #   needs: deploy_qa
+  #   name: Deploy to Kubernetes Staging Cluster
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v2
+  #   - name: Create kubeconfig
+  #     run: |
+  #       mkdir ${HOME}/.kube
+  #       echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+  #       cat ${HOME}/.kube/config
+  #   - name: Use context
+  #     run: kubectl config use-context aks-sandbox
+  #   - name: Deploy to K8s
+  #     run: helm upgrade --install -f helm/staging/values.yaml webapp helm/webapp/ -n staging
 
-  deploy_prod:
-    needs: deploy_staging
-    name: Deploy to Kubernetes PROD Cluster
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Create kubeconfig
-      run: |
-        mkdir ${HOME}/.kube
-        echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
-        cat ${HOME}/.kube/config
-    - name: Use context
-      run: kubectl config use-context aks-sandbox
-    - name: Deploy to K8s
-      run: helm upgrade --install -f helm/prod/values.yaml webapp helm/webapp/ -n prod
+  # deploy_prod:
+  #   needs: deploy_staging
+  #   name: Deploy to Kubernetes PROD Cluster
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v2
+  #   - name: Create kubeconfig
+  #     run: |
+  #       mkdir ${HOME}/.kube
+  #       echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+  #       cat ${HOME}/.kube/config
+  #   - name: Use context
+  #     run: kubectl config use-context aks-sandbox
+  #   - name: Deploy to K8s
+  #     run: helm upgrade --install -f helm/prod/values.yaml webapp helm/webapp/ -n prod
