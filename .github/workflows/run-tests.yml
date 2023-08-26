@@ -1,0 +1,44 @@
+name: Run tests
+
+# on:
+#   pull_request:
+#     branches:
+#       - feature/*
+on:
+  push:
+    branches: 
+      - feature/*
+
+jobs:
+  run_test:
+    name: Run js tests
+    runs-on: ubuntu-latest
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: run tests
+        run: |
+          npm install
+          npm i @testing-library/jest-dom
+          npm i -D --exact jest-watch-typeahead@0.6.5
+          npm install --save-dev @testing-library/react
+          npm test -- --watchAll=false
+  build:
+    needs: run_test
+    name: build source
+    runs-on: ubuntu-latest
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Build Docker image
+        run: |
+          docker build -t webapp:latest .
+      
