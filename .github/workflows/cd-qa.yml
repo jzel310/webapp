@@ -3,7 +3,7 @@ name: Build and deploy webapp to qa
 on:
   push:
     branches: 
-      - release
+      - release/*
 
 jobs:
   deploy_qa:
@@ -12,8 +12,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-          with:
-            ref: develop
+        
       - name: Create kubeconfig
         run: |
           mkdir ${HOME}/.kube
