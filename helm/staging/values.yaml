@@ -48,7 +48,13 @@ ingress:
           pathType: ImplementationSpecific
   tls: []
 
-resources: {}
+resources:
+    requests:
+      memory: 256Mi
+      cpu: 200m
+    limits:
+      cpu: 225m
+      memory: 512Mi
 
 nodeSelector: {}
 
