@@ -1,13 +1,9 @@
 name: Run tests
 
-# on:
-#   pull_request:
-#     branches:
-#       - feature/*
 on:
-  push:
-    branches: 
-      - feature/*
+  pull_request:
+    branches:
+      - develop
 
 jobs:
   run_test:
@@ -27,13 +23,6 @@ jobs:
           node-version: '18.x'
       - run: npm install
       - run: npm test -- --watchAll=false
-      # - name: run tests
-      #   run: |
-      #     npm install --force
-      #     npm i @testing-library/jest-dom
-      #     npm i -D --exact jest-watch-typeahead@0.6.5
-      #     npm install --save-dev @testing-library/react
-      #     npm test -- --watchAll=false
   build:
     needs: run_test
     name: build source
